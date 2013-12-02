@@ -20,6 +20,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,12 +28,13 @@ public class RechargeActivity extends AbstractActivity implements OnClickListene
 
 	private ImageView recharge_back;
 	private TextView recharge_confirm;
-	private TextView recharge_20;
-	private TextView recharge_30;
-	private TextView recharge_50;
-	private TextView recharge_100;
-	private TextView recharge_200;
+//	private TextView recharge_20;
+//	private TextView recharge_30;
+//	private TextView recharge_50;
+//	private TextView recharge_100;
+//	private TextView recharge_200;
 	private TextView recharge_alipay;
+	private EditText recharge_custom;
 	private Double recharge_num = (double) -1;
 	private Integer paymode = -1;
 	private Boolean isClickPay = false;
@@ -57,11 +59,12 @@ public class RechargeActivity extends AbstractActivity implements OnClickListene
 	public void setUpView() {
 		recharge_back = (ImageView) this.findViewById(R.id.recharge_back);
 		recharge_confirm = (TextView) this.findViewById(R.id.recharge_confirm);
-		recharge_20 = (TextView) this.findViewById(R.id.recharge_20);
-		recharge_30 = (TextView) this.findViewById(R.id.recharge_30);
-		recharge_50 = (TextView) this.findViewById(R.id.recharge_50);
-		recharge_100 = (TextView) this.findViewById(R.id.recharge_100);
-		recharge_200 = (TextView) this.findViewById(R.id.recharge_200);
+//		recharge_20 = (TextView) this.findViewById(R.id.recharge_20);
+//		recharge_30 = (TextView) this.findViewById(R.id.recharge_30);
+//		recharge_50 = (TextView) this.findViewById(R.id.recharge_50);
+//		recharge_100 = (TextView) this.findViewById(R.id.recharge_100);
+//		recharge_200 = (TextView) this.findViewById(R.id.recharge_200);
+		recharge_custom = (EditText)this.findViewById(R.id.recharge_custom);
 		recharge_alipay = (TextView) this.findViewById(R.id.recharge_alipay);
 
 		as = new AccountService(RechargeActivity.this);
@@ -69,11 +72,11 @@ public class RechargeActivity extends AbstractActivity implements OnClickListene
 
 		recharge_back.setOnClickListener(this);
 		recharge_confirm.setOnClickListener(this);
-		recharge_20.setOnClickListener(this);
-		recharge_30.setOnClickListener(this);
-		recharge_50.setOnClickListener(this);
-		recharge_100.setOnClickListener(this);
-		recharge_200.setOnClickListener(this);
+//		recharge_20.setOnClickListener(this);
+//		recharge_30.setOnClickListener(this);
+//		recharge_50.setOnClickListener(this);
+//		recharge_100.setOnClickListener(this);
+//		recharge_200.setOnClickListener(this);
 		recharge_alipay.setOnClickListener(this);
 	}
 
@@ -86,7 +89,7 @@ public class RechargeActivity extends AbstractActivity implements OnClickListene
 		case R.id.recharge_confirm:
 			AlertDialog.Builder alertDialog = new AlertDialog.Builder(RechargeActivity.this);
 			alertDialog.setItems(new String[] { "支付宝网页充值", "支付宝快捷充值" }, new DialogInterface.OnClickListener() {
-
+				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					switch (which) {
@@ -98,36 +101,38 @@ public class RechargeActivity extends AbstractActivity implements OnClickListene
 						break;
 					}
 					showProgressDialog("正在提交充值请求...");
+					System.out.println(recharge_custom.getText().toString());
+					recharge_num = Double.parseDouble(recharge_custom.getText().toString());
 					new Thread(new RechargeHttp(RechargeActivity.this, payOrderHandler, account.getUserid(), account.getTicket(), paymode, recharge_num)).start();
 				}
 			});
 			alertDialog.show();
 			break;
 
-		case R.id.recharge_20:
-			setClick(recharge_20);
-			recharge_num = (double) 20;
-			break;
-
-		case R.id.recharge_30:
-			setClick(recharge_30);
-			recharge_num = (double) 30;
-			break;
-
-		case R.id.recharge_50:
-			setClick(recharge_50);
-			recharge_num = (double) 50;
-			break;
-
-		case R.id.recharge_100:
-			setClick(recharge_100);
-			recharge_num = (double) 100;
-			break;
-
-		case R.id.recharge_200:
-			setClick(recharge_200);
-			recharge_num = (double) 200;
-			break;
+//		case R.id.recharge_20:
+//			setClick(recharge_20);
+//			recharge_num = (double) 20;
+//			break;
+//
+//		case R.id.recharge_30:
+//			setClick(recharge_30);
+//			recharge_num = (double) 30;
+//			break;
+//
+//		case R.id.recharge_50:
+//			setClick(recharge_50);
+//			recharge_num = (double) 50;
+//			break;
+//
+//		case R.id.recharge_100:
+//			setClick(recharge_100);
+//			recharge_num = (double) 100;
+//			break;
+//
+//		case R.id.recharge_200:
+//			setClick(recharge_200);
+//			recharge_num = (double) 200;
+//			break;
 
 		case R.id.recharge_alipay:
 			recharge_alipay.setBackgroundResource(R.drawable.recharge_clicked);
@@ -192,16 +197,16 @@ public class RechargeActivity extends AbstractActivity implements OnClickListene
 
 	public void setClick(TextView tv) {
 
-		recharge_20.setBackgroundResource(R.drawable.recharge_unclick);
-		recharge_20.setTextColor(getResources().getColor(R.color.zaoke_orange));
-		recharge_30.setBackgroundResource(R.drawable.recharge_unclick);
-		recharge_30.setTextColor(getResources().getColor(R.color.zaoke_orange));
-		recharge_50.setBackgroundResource(R.drawable.recharge_unclick);
-		recharge_50.setTextColor(getResources().getColor(R.color.zaoke_orange));
-		recharge_100.setBackgroundResource(R.drawable.recharge_unclick);
-		recharge_100.setTextColor(getResources().getColor(R.color.zaoke_orange));
-		recharge_200.setBackgroundResource(R.drawable.recharge_unclick);
-		recharge_200.setTextColor(getResources().getColor(R.color.zaoke_orange));
+//		recharge_20.setBackgroundResource(R.drawable.recharge_unclick);
+//		recharge_20.setTextColor(getResources().getColor(R.color.zaoke_orange));
+//		recharge_30.setBackgroundResource(R.drawable.recharge_unclick);
+//		recharge_30.setTextColor(getResources().getColor(R.color.zaoke_orange));
+//		recharge_50.setBackgroundResource(R.drawable.recharge_unclick);
+//		recharge_50.setTextColor(getResources().getColor(R.color.zaoke_orange));
+//		recharge_100.setBackgroundResource(R.drawable.recharge_unclick);
+//		recharge_100.setTextColor(getResources().getColor(R.color.zaoke_orange));
+//		recharge_200.setBackgroundResource(R.drawable.recharge_unclick);
+//		recharge_200.setTextColor(getResources().getColor(R.color.zaoke_orange));
 		
 		tv.setBackgroundResource(R.drawable.recharge_clicked);
 		tv.setTextColor(getResources().getColor(R.color.izaoke_white));

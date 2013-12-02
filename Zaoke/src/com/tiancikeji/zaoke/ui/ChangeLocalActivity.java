@@ -64,63 +64,63 @@ public class ChangeLocalActivity extends AbstractActivity  {
 	private List<Map<String, Object>> getListData(List<LocalBase> locations) {
 		
 		dataList = new ArrayList<Map<String,Object>>();
-		for(int i = 0 ;i <locations.size() ; i++){
+		for(int i = 0 ;i <locations.get(0).getPick_loc_list().get(0).getPick_loc_list().size() ; i++){
 			Map<String,Object> itemi = new HashMap<String, Object>();
 			itemi.put(MultiExpandableAdapter.KEY_LEVEL, 1);
-			itemi.put(MultiExpandableAdapter.KEY_EXPANDED, true);
-			itemi.put("title", locations.get(i).getPick_loc_name());
-			itemi.put("obj", locations.get(i));
+			itemi.put(MultiExpandableAdapter.KEY_EXPANDED, false);
+			itemi.put("title", locations.get(0).getPick_loc_list().get(0).getPick_loc_list().get(i).getPick_loc_name());
+			itemi.put("obj", locations.get(0).getPick_loc_list().get(0).getPick_loc_list().get(i));
 			dataList.add(itemi);
 		}
 		
-		createChild(locations);
+//		createChild(locations);
 		
 		return dataList;
 	}
 	
-	private void createChild(List<LocalBase> locations) {
-		child1 = new ArrayList<Map<String,Object>>();
-		Map<String,Object> item11 = new HashMap<String, Object>();
-		
-		item11.put(MultiExpandableAdapter.KEY_LEVEL, 2);
-		item11.put(MultiExpandableAdapter.KEY_EXPANDED, true);
-		
-		item11.put("title", locations.get(0).getPick_loc_list().get(0).getPick_loc_name());
-		item11.put("obj", locations.get(0).getPick_loc_list().get(0));
-		
-		child1.add(item11);
-		
-		child2 = new ArrayList<Map<String,Object>>();
-		Map<String,Object> item2 = new HashMap<String, Object>();
-		
-		item2.put(MultiExpandableAdapter.KEY_LEVEL, 3);
-		item2.put(MultiExpandableAdapter.KEY_EXPANDED, true);
-		
-		item2.put("title", locations.get(0).getPick_loc_list().get(0).getPick_loc_list().get(0).getPick_loc_name());
-		item2.put("obj", locations.get(0).getPick_loc_list().get(0).getPick_loc_list().get(0));
-		
-		child2.add(item2);
-
-	}
+//	private void createChild(List<LocalBase> locations) {
+//		child1 = new ArrayList<Map<String,Object>>();
+//		Map<String,Object> item11 = new HashMap<String, Object>();
+//		
+//		item11.put(MultiExpandableAdapter.KEY_LEVEL, 2);
+//		item11.put(MultiExpandableAdapter.KEY_EXPANDED, true);
+//		
+//		item11.put("title", locations.get(0).getPick_loc_list().get(0).getPick_loc_name());
+//		item11.put("obj", locations.get(0).getPick_loc_list().get(0));
+//		
+//		child1.add(item11);
+//		
+//		child2 = new ArrayList<Map<String,Object>>();
+//		Map<String,Object> item2 = new HashMap<String, Object>();
+//		
+//		item2.put(MultiExpandableAdapter.KEY_LEVEL, 3);
+//		item2.put(MultiExpandableAdapter.KEY_EXPANDED, true);
+//		
+//		item2.put("title", locations.get(0).getPick_loc_list().get(0).getPick_loc_list().get(0).getPick_loc_name());
+//		item2.put("obj", locations.get(0).getPick_loc_list().get(0).getPick_loc_list().get(0));
+//		
+//		child2.add(item2);
+//
+//	}
 	
 	private class ItemClickListner implements OnItemClickListener{
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			Map<String, Object> item = dataList.get(position);
-			String title = (String)item.get("title");
+//			String title = (String)item.get("title");
 			LocalBase  locs = (LocalBase)item.get("obj");
-			boolean expanded = (Boolean)item.get(MultiExpandableAdapter.KEY_EXPANDED);
+//			boolean expanded = (Boolean)item.get(MultiExpandableAdapter.KEY_EXPANDED);
 //			System.out.println(item.get(MultiExpandableAdapter.KEY_LEVEL));
-			if(!expanded){
-				if("朝阳区".equals(title)){
-					mAdapter.addChildListData(child1, position);
-				}
-				if("亮马桥".equals(title)){
-					mAdapter.addChildListData(child2, position);
-				}
-			}else{
-				mAdapter.removeChildListData(position);
-			}
-			if("3".equals(item.get(MultiExpandableAdapter.KEY_LEVEL).toString())){
+//			if(!expanded){
+//				if("朝阳区".equals(title)){
+//					mAdapter.addChildListData(child1, position);
+//				}
+//				if("亮马桥".equals(title)){
+//					mAdapter.addChildListData(child2, position);
+//				}
+//			}else{
+//				mAdapter.removeChildListData(position);
+//			}
+//			if("3".equals(item.get(MultiExpandableAdapter.KEY_LEVEL).toString())){
 				Intent toChangelocal = new Intent(ChangeLocalActivity.this,ShopingCartActivity.class);
 				Bundle bundle = new Bundle();
 				bundle.putSerializable("orderBase", orderBase);
@@ -134,7 +134,7 @@ public class ChangeLocalActivity extends AbstractActivity  {
 				as.saveOrUpdate(account);
 				toChangelocal.putExtras(bundle);
 				startActivity(toChangelocal);
-			}
+//			}
 		}
 	}
 	

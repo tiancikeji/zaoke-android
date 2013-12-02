@@ -57,7 +57,7 @@ public class ShopingCartActivity extends AbstractActivity {
 	private TextView my_order_yinliaoprice;
 	private ImageView cart_shipin_image;
 	private ImageView cart_yinliao_image;
-//	private TextView order_price_original;
+	// private TextView order_price_original;
 	private TextView order_combprice;
 	private TextView cart_nick_name;
 	private TextView cart_place_name;
@@ -81,23 +81,26 @@ public class ShopingCartActivity extends AbstractActivity {
 	@Override
 	protected void onRestart() {
 		super.onRestart();
-		setClick(null);
+		// setClick(null);
 		if (as.isExist()) {
 			dbaccount = as.getAccount();
 			cart_place_name.setText(dbaccount.getLocal());
-			cart_user_account_yue.setText(String.valueOf(dbaccount.getBalance()));
+			cart_user_account_yue
+					.setText(String.valueOf(dbaccount.getBalance()));
 			if (dbaccount.getEndtime() == null) {
 				shopping_cart_locmsg.setText(dbaccount.getStarttime());
 			} else {
-				shopping_cart_locmsg.setText("请您于明天" + dbaccount.getStarttime() + "到" + dbaccount.getEndtime() + "取餐");
+				shopping_cart_locmsg.setText("请您于明天" + dbaccount.getStarttime()
+						+ "到" + dbaccount.getEndtime() + "取餐");
 			}
 			shopping_cart_locmsg.setText(checkOrderBase.getPick_time());
-			
-			
+
 		}
 
 		if (isClickPay) {
-			new Thread(new FinalOrderListHttp(ShopingCartActivity.this, new IsClickPayHandler(), dbaccount.getUserid(), dbaccount.getTicket())).start();
+			new Thread(new FinalOrderListHttp(ShopingCartActivity.this,
+					new IsClickPayHandler(), dbaccount.getUserid(),
+					dbaccount.getTicket())).start();
 		}
 	}
 
@@ -108,22 +111,29 @@ public class ShopingCartActivity extends AbstractActivity {
 		Bundle bundle = this.getIntent().getExtras();
 		orderBase = (OrderBase) bundle.getSerializable("orderBase");
 		init();
-//		String cart_place_name_string = bundle.getString("cart_place_name_string");
-//		cart_place_name.setText(cart_place_name_string);
+		// String cart_place_name_string =
+		// bundle.getString("cart_place_name_string");
+		// cart_place_name.setText(cart_place_name_string);
 	}
 
 	public void init() {
-		my_order_shipinname = (TextView) this.findViewById(R.id.my_order_shipinname);
-		my_order_yinliaoname = (TextView) this.findViewById(R.id.my_order_yinliaoname);
-		my_order_shipinprice = (TextView) this.findViewById(R.id.my_order_shipinprice);
-		my_order_yinliaoprice = (TextView) this.findViewById(R.id.my_order_yinliaoprice);
+		my_order_shipinname = (TextView) this
+				.findViewById(R.id.my_order_shipinname);
+		my_order_yinliaoname = (TextView) this
+				.findViewById(R.id.my_order_yinliaoname);
+		my_order_shipinprice = (TextView) this
+				.findViewById(R.id.my_order_shipinprice);
+		my_order_yinliaoprice = (TextView) this
+				.findViewById(R.id.my_order_yinliaoprice);
 		shoping_cart_back = (ImageView) findViewById(R.id.shoping_cart_back);
 		shoping_cart_submit = (TextView) findViewById(R.id.shoping_cart_submit);
 		cart_shipin_image = (ImageView) findViewById(R.id.cart_shipin_image);
 		cart_yinliao_image = (ImageView) findViewById(R.id.cart_yinliao_image);
-//		order_price_original = (TextView) findViewById(R.id.order_price_original);
+		// order_price_original = (TextView)
+		// findViewById(R.id.order_price_original);
 		order_combprice = (TextView) this.findViewById(R.id.order_combprice);
-		shopping_cart_locmsg = (TextView) this.findViewById(R.id.shopping_cart_locmsg);
+		shopping_cart_locmsg = (TextView) this
+				.findViewById(R.id.shopping_cart_locmsg);
 
 		cart_nick_name = (TextView) findViewById(R.id.cart_nick_name);
 
@@ -140,12 +150,15 @@ public class ShopingCartActivity extends AbstractActivity {
 		showProgressDialog("正在加载订单...");
 		as = new AccountService(this);
 		dbaccount = new Dbaccount();
-		
+
 		SpannableString msp = new SpannableString("￥" + orderBase.getPrice());
-		msp.setSpan(new StrikethroughSpan(), 0, String.valueOf(orderBase.getPrice()).length()+	1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-		
-//		order_price_original.setText(msp);
-		order_combprice.setText("￥" + NumberFormateUtil.Formate(orderBase.getCombinePrice()));
+		msp.setSpan(new StrikethroughSpan(), 0,
+				String.valueOf(orderBase.getPrice()).length() + 1,
+				Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+		// order_price_original.setText(msp);
+		order_combprice.setText("￥"
+				+ NumberFormateUtil.Formate(orderBase.getCombinePrice()));
 		order.setCombPrice(orderBase.getCombinePrice());
 		dbaccount = as.getAccount();
 
@@ -165,7 +178,10 @@ public class ShopingCartActivity extends AbstractActivity {
 			my_order_yinliaoname.setText(order.getYinliaoName());
 			my_order_yinliaoprice.setText("￥" + order.getYinliaoPrice());
 			setImageBg(cart_yinliao_image, order.getYinliaoUrl());
-			new Thread(new CheckOrderHttp(ShopingCartActivity.this, orderHandler, orderBase.getShipin().getId(), orderBase.getYinliao().getId(), name, dbaccount.getUserid(), dbaccount.getTicket())).start();
+			new Thread(new CheckOrderHttp(ShopingCartActivity.this,
+					orderHandler, orderBase.getShipin().getId(), orderBase
+							.getYinliao().getId(), name, dbaccount.getUserid(),
+					dbaccount.getTicket())).start();
 		} else if (orderBase.getShipin() == null) {
 			order.setYinliaoId(orderBase.getYinliao().getId());
 			order.setYinliaoName(orderBase.getYinliao().getName());
@@ -174,7 +190,9 @@ public class ShopingCartActivity extends AbstractActivity {
 			my_order_yinliaoname.setText(order.getYinliaoName());
 			my_order_yinliaoprice.setText("￥" + order.getYinliaoPrice());
 			setImageBg(cart_yinliao_image, order.getYinliaoUrl());
-			new Thread(new CheckOrderHttp(ShopingCartActivity.this, orderHandler, 0, orderBase.getYinliao().getId(), name, dbaccount.getUserid(), dbaccount.getTicket())).start();
+			new Thread(new CheckOrderHttp(ShopingCartActivity.this,
+					orderHandler, 0, orderBase.getYinliao().getId(), name,
+					dbaccount.getUserid(), dbaccount.getTicket())).start();
 		} else if (orderBase.getYinliao() == null) {
 			order.setShiwuId(orderBase.getShipin().getId());
 			order.setShiwuName(orderBase.getShipin().getName());
@@ -183,14 +201,19 @@ public class ShopingCartActivity extends AbstractActivity {
 			my_order_shipinname.setText(order.getShiwuName());
 			my_order_shipinprice.setText("￥" + order.getShiwuPrice());
 			setImageBg(cart_shipin_image, order.getShiwuUrl());
-			new Thread(new CheckOrderHttp(ShopingCartActivity.this, orderHandler, orderBase.getShipin().getId(), 0, name, dbaccount.getUserid(), dbaccount.getTicket())).start();
+			new Thread(new CheckOrderHttp(ShopingCartActivity.this,
+					orderHandler, orderBase.getShipin().getId(), 0, name,
+					dbaccount.getUserid(), dbaccount.getTicket())).start();
 		}
 
 		shoping_cart_submit.setOnClickListener(new shoping_cart_submit_click());
 		shoping_cart_back.setOnClickListener(new shoping_cart_back_click());
-		shoping_cart_recharge.setOnClickListener(new shoping_cart_recharge_click());
-		shoping_cart_bindcart.setOnClickListener(new shoping_cart_bindcart_click());
-		shoping_cart_changeplace.setOnClickListener(new shoping_cart_changeplace_click());
+		shoping_cart_recharge
+				.setOnClickListener(new shoping_cart_recharge_click());
+		shoping_cart_bindcart
+				.setOnClickListener(new shoping_cart_bindcart_click());
+		shoping_cart_changeplace
+				.setOnClickListener(new shoping_cart_changeplace_click());
 		cart_zhifubao.setOnClickListener(new cart_zhifubao_click());
 		cart_yue.setOnClickListener(new cart_yue_click());
 		cart_xianjin.setOnClickListener(new cart_xianjin_click());
@@ -208,7 +231,7 @@ public class ShopingCartActivity extends AbstractActivity {
 				for (PaymodeBase pmb : checkOrderBase.getPaymode()) {
 					payMap.put(pmb.getMode(), pmb.getName());
 				}
-//				System.out.print("-----------"+checkOrderBase.getPick_loc_name()+"----------------");
+				// System.out.print("-----------"+checkOrderBase.getPick_loc_name()+"----------------");
 				if (!payMap.containsKey("0")) {
 					cart_xianjin.setVisibility(View.GONE);
 				}
@@ -224,7 +247,9 @@ public class ShopingCartActivity extends AbstractActivity {
 				if (checkOrderBase.getPick_loc_name() != null) {
 					shopping_cart_locmsg.setText(checkOrderBase.getPick_time());
 					cart_place_name.setText(checkOrderBase.getPick_loc_name());
-					System.out.print("-----------"+checkOrderBase.getPick_loc_name()+"----------------");
+					System.out.print("-----------"
+							+ checkOrderBase.getPick_loc_name()
+							+ "----------------");
 					dbaccount.setLocal(checkOrderBase.getPick_loc_name());
 					dbaccount.setLocid(checkOrderBase.getPick_loc_id());
 					dbaccount.setStarttime(checkOrderBase.getPick_date());
@@ -232,14 +257,19 @@ public class ShopingCartActivity extends AbstractActivity {
 					dbaccount.setBalance(checkOrderBase.getBalance());
 					dbaccount.setEndtime("");
 					as.saveOrUpdate(dbaccount);
-				} //else if (dbaccount.getLocal() != null) {
-				else{
+				} // else if (dbaccount.getLocal() != null) {
+				else {
 					if (dbaccount.getEndtime() == null) {
-						shopping_cart_locmsg.setText("请您于" + checkOrderBase.getPick_date() + dbaccount.getStarttime()  + "取餐");
+						shopping_cart_locmsg.setText("请您于"
+								+ checkOrderBase.getPick_date()
+								+ dbaccount.getStarttime() + "取餐");
 					} else {
-						shopping_cart_locmsg.setText("请您于" + checkOrderBase.getPick_date() + dbaccount.getStarttime() + "到" + dbaccount.getEndtime() + "取餐");
+						shopping_cart_locmsg.setText("请您于"
+								+ checkOrderBase.getPick_date()
+								+ dbaccount.getStarttime() + "到"
+								+ dbaccount.getEndtime() + "取餐");
 					}
-					
+
 					cart_place_name.setText(dbaccount.getLocal());
 				}
 				break;
@@ -257,108 +287,140 @@ public class ShopingCartActivity extends AbstractActivity {
 	};
 
 	public void setImageBg(final ImageView imageView, String url) {
-		new AsyncImageLoader().loadBitmap(ShopingCartActivity.this, url, new ImageCallback() {
+		new AsyncImageLoader().loadBitmap(ShopingCartActivity.this, url,
+				new ImageCallback() {
 
-			@Override
-			public void imageLoaded(Bitmap bitmap, String imageUrl) {
-				imageView.setImageBitmap(bitmap);
-			}
-		});
+					@Override
+					public void imageLoaded(Bitmap bitmap, String imageUrl) {
+						imageView.setImageBitmap(bitmap);
+					}
+				});
 	}
 
 	private class shoping_cart_submit_click implements OnClickListener {
 		@Override
 		public void onClick(View v) {
-			
 
-			
 			if (TextUtils.isEmpty(cart_place_name.getText())) {
 				displayResponse("请选择取餐地点");
 				return;
-			} 
+			}
 			if (paymode == -1) {
 				displayResponse("请选择支付方式");
 				return;
-			} 
-			
-			if(null == dbaccount.getPhone()){
-				Intent toRegister1 = new Intent(ShopingCartActivity.this, Register1Activity.class);
+			}
+
+			if (null == dbaccount.getPhone()) {
+				Intent toRegister1 = new Intent(ShopingCartActivity.this,
+						Register1Activity.class);
 				startActivity(toRegister1);
 				return;
 			}
-		
+
 			if (!order.isComplete()) {
 				displayResponse("订单信息不完整，请您检查一下");
-			}else{
+			} else {
 				order.setPaymode(paymode);
 				order.setLocal(dbaccount.getLocal());
 				order.setLocId(dbaccount.getLocid());
 				order.setStarttime(dbaccount.getStarttime());
 				order.setEndtime(dbaccount.getEndtime());
 				order.setUserid(dbaccount.getUserid());
-				final String shiwuId = order.getShiwuId() == null ? "" : String.valueOf(order.getShiwuId());
-				final String yinliaoId = order.getYinliaoId() == null ? "" : String.valueOf(order.getYinliaoId());
+				final String shiwuId = order.getShiwuId() == null ? "" : String
+						.valueOf(order.getShiwuId());
+				final String yinliaoId = order.getYinliaoId() == null ? ""
+						: String.valueOf(order.getYinliaoId());
 
 				if (paymode == 2 || paymode == 3)// 支付宝支付
 				{
 					if (payMap.containsKey("2") && payMap.containsKey("3")) { // 选择
 
-						AlertDialog.Builder alertDialog = new AlertDialog.Builder(ShopingCartActivity.this);
-						alertDialog.setItems(new String[] { "支付宝网页支付", "支付宝快捷支付" }, new DialogInterface.OnClickListener() {
+						AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+								ShopingCartActivity.this);
+						alertDialog.setItems(new String[] { "支付宝网页支付",
+								"支付宝快捷支付" },
+								new DialogInterface.OnClickListener() {
 
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								switch (which) {
-								case 0:
-									paymode = 2;
-									showProgressDialog("提交订单中...");
-									new Thread(new PayHttp(ShopingCartActivity.this, new PayOrderHandler(), shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
-									break;
-								case 1:
-									paymode = 3;
-									order.setPaymode(paymode);
-									showProgressDialog("提交订单中...");
-									new Thread(new PayHttp(ShopingCartActivity.this, new PayOrderHandler(), shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
-									break;
-								}
-							}
-						});
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										switch (which) {
+										case 0:
+											paymode = 2;
+											showProgressDialog("提交订单中...");
+											new Thread(new PayHttp(
+													ShopingCartActivity.this,
+													new PayOrderHandler(),
+													shiwuId, yinliaoId, order
+															.getUserid(),
+													dbaccount.getTicket(),
+													paymode, order.getLocId()))
+													.start();
+											break;
+										case 1:
+											paymode = 3;
+											order.setPaymode(paymode);
+											showProgressDialog("提交订单中...");
+											new Thread(new PayHttp(
+													ShopingCartActivity.this,
+													new PayOrderHandler(),
+													shiwuId, yinliaoId, order
+															.getUserid(),
+													dbaccount.getTicket(),
+													paymode, order.getLocId()))
+													.start();
+											break;
+										}
+									}
+								});
 						alertDialog.show();
 					} else if (payMap.containsKey("3")) { // 支付宝快捷
 						paymode = 3;
 						order.setPaymode(paymode);
 						showProgressDialog("提交订单中...");
-						new Thread(new PayHttp(ShopingCartActivity.this, new PayOrderHandler(), shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
+						new Thread(new PayHttp(ShopingCartActivity.this,
+								new PayOrderHandler(), shiwuId, yinliaoId,
+								order.getUserid(), dbaccount.getTicket(),
+								paymode, order.getLocId())).start();
 					} else { // 支付宝网页
 						showProgressDialog("提交订单中...");
-						new Thread(new PayHttp(ShopingCartActivity.this, new PayOrderHandler(), shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
+						new Thread(new PayHttp(ShopingCartActivity.this,
+								new PayOrderHandler(), shiwuId, yinliaoId,
+								order.getUserid(), dbaccount.getTicket(),
+								paymode, order.getLocId())).start();
 					}
 				} else if (paymode == 1) {
 					showProgressDialog("提交订单中...");
-					new Thread(new PayHttp(ShopingCartActivity.this, new PayOrderHandler(), shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
+					new Thread(new PayHttp(ShopingCartActivity.this,
+							new PayOrderHandler(), shiwuId, yinliaoId,
+							order.getUserid(), dbaccount.getTicket(), paymode,
+							order.getLocId())).start();
 				} else {
 					showProgressDialog("提交订单中...");
-					new Thread(new PayHttp(ShopingCartActivity.this, new PayOrderHandler(), shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
+					new Thread(new PayHttp(ShopingCartActivity.this,
+							new PayOrderHandler(), shiwuId, yinliaoId,
+							order.getUserid(), dbaccount.getTicket(), paymode,
+							order.getLocId())).start();
 				}
 			}
 		}
 
-		
 	}
-	
-	private class shoping_cart_back_click implements OnClickListener{
+
+	private class shoping_cart_back_click implements OnClickListener {
 		@Override
 		public void onClick(View v) {
 			// TODO Auto-generated method stub
 			finish();
 		}
 	}
-	
-	private class shoping_cart_changeplace_click implements OnClickListener{
+
+	private class shoping_cart_changeplace_click implements OnClickListener {
 		@Override
 		public void onClick(View v) {
 			// TODO Auto-generated method stub
-			Intent toChangelocal = new Intent(ShopingCartActivity.this, ChangeLocalActivity.class);
+			Intent toChangelocal = new Intent(ShopingCartActivity.this,
+					ChangeLocalActivity.class);
 			Bundle bundle = new Bundle();
 			bundle.putBoolean("isRoot", true);
 			bundle.putSerializable("orderBase", orderBase);
@@ -366,111 +428,130 @@ public class ShopingCartActivity extends AbstractActivity {
 			startActivity(toChangelocal);
 		}
 	}
-	
-	
-	private class shoping_cart_bindcart_click implements OnClickListener{
+
+	private class shoping_cart_bindcart_click implements OnClickListener {
 		@Override
 		public void onClick(View v) {
-				if (as.getAccount().getPhone() != null) {
-				AlertDialog.Builder alertDialog = new AlertDialog.Builder(ShopingCartActivity.this);
-				alertDialog.setItems(new String[] { "扫描条码", "手工输入" }, new DialogInterface.OnClickListener() {
-	
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						switch (which) {
-						case 0:
-							Intent toQXReader = new Intent(ShopingCartActivity.this, QXReaderActivity.class);
-							startActivityForResult(toQXReader, AppConstant.QXReader);
-							break;
-						case 1:
-							Intent toBindCardActivity = new Intent(ShopingCartActivity.this, BindCardActivity.class);
-							startActivity(toBindCardActivity);
-							break;
-						}
-					}
-				});
+			if (as.getAccount().getPhone() != null) {
+				AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+						ShopingCartActivity.this);
+				alertDialog.setItems(new String[] { "扫描条码", "手工输入" },
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								switch (which) {
+								case 0:
+									Intent toQXReader = new Intent(
+											ShopingCartActivity.this,
+											QXReaderActivity.class);
+									startActivityForResult(toQXReader,
+											AppConstant.QXReader);
+									break;
+								case 1:
+									Intent toBindCardActivity = new Intent(
+											ShopingCartActivity.this,
+											BindCardActivity.class);
+									startActivity(toBindCardActivity);
+									break;
+								}
+							}
+						});
 				alertDialog.show();
 			} else {
-//				new ZaokeAlertDialog(this, "用户注册后才能绑定会员卡，是否前往", new DialogInterface.OnClickListener() {
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						Intent toRegister1 = new Intent(ShopingCartActivity.this, Register1Activity.class);
-//						startActivity(toRegister1);
-//					}
-//				}, new DialogInterface.OnClickListener() {
-//	
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						dialog.dismiss();
-//					}
-//				}).creat();
+				// new ZaokeAlertDialog(this, "用户注册后才能绑定会员卡，是否前往", new
+				// DialogInterface.OnClickListener() {
+				// @Override
+				// public void onClick(DialogInterface dialog, int which) {
+				// Intent toRegister1 = new Intent(ShopingCartActivity.this,
+				// Register1Activity.class);
+				// startActivity(toRegister1);
+				// }
+				// }, new DialogInterface.OnClickListener() {
+				//
+				// @Override
+				// public void onClick(DialogInterface dialog, int which) {
+				// dialog.dismiss();
+				// }
+				// }).creat();
 			}
 		}
 	}
 
-	private class shoping_cart_recharge_click implements OnClickListener{
+	private class shoping_cart_recharge_click implements OnClickListener {
 		@Override
 		public void onClick(View v) {
 			if (as.getAccount().getPhone() == null) {
-//				new ZaokeAlertDialog(this, "用户注册后才能充值，是否前往", new DialogInterface.OnClickListener() {
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						Intent toRegister1 = new Intent(ShopingCartActivity.this, Register1Activity.class);
-//						startActivity(toRegister1);
-//					}
-//				}, new DialogInterface.OnClickListener() {
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						dialog.dismiss();
-//					}
-//				}).creat();
+				// new ZaokeAlertDialog(this, "用户注册后才能充值，是否前往", new
+				// DialogInterface.OnClickListener() {
+				// @Override
+				// public void onClick(DialogInterface dialog, int which) {
+				// Intent toRegister1 = new Intent(ShopingCartActivity.this,
+				// Register1Activity.class);
+				// startActivity(toRegister1);
+				// }
+				// }, new DialogInterface.OnClickListener() {
+				// @Override
+				// public void onClick(DialogInterface dialog, int which) {
+				// dialog.dismiss();
+				// }
+				// }).creat();
 			} else {
-				Intent toRechargeActivity = new Intent(ShopingCartActivity.this, RechargeActivity.class);
+				Intent toRechargeActivity = new Intent(
+						ShopingCartActivity.this, RechargeActivity.class);
 				startActivity(toRechargeActivity);
 			}
 		}
 	}
-	
-	private class cart_zhifubao_click implements OnClickListener{
+
+	private class cart_zhifubao_click implements OnClickListener {
 		@Override
 		public void onClick(View v) {
-			setClick(cart_zhifubao);
+			cart_yue.setBackgroundResource(R.drawable.recharge_unclick);
+			cart_xianjin.setBackgroundResource(R.drawable.recharge_unclick);
+			cart_yue.setTextColor(getResources().getColor(R.color.zaoke_orange));
+			cart_xianjin.setTextColor(getResources().getColor(
+					R.color.zaoke_orange));
+			((TextView) v).setBackgroundResource(R.drawable.recharge_clicked);
+			((TextView) v).setTextColor(getResources().getColor(
+					R.color.izaoke_white));
 			paymode = 2;
 		}
 	}
-	
-	private class cart_yue_click implements OnClickListener{
+
+	private class cart_yue_click implements OnClickListener {
 		@Override
 		public void onClick(View v) {
-			setClick(cart_zhifubao);
+			cart_zhifubao.setBackgroundResource(R.drawable.recharge_unclick);
+			cart_xianjin.setBackgroundResource(R.drawable.recharge_unclick);
+			cart_zhifubao.setTextColor(getResources().getColor(
+					R.color.zaoke_orange));
+			cart_xianjin.setTextColor(getResources().getColor(
+					R.color.zaoke_orange));
+			((TextView) v).setBackgroundResource(R.drawable.recharge_clicked);
+			((TextView) v).setTextColor(getResources().getColor(
+					R.color.izaoke_white));
 			paymode = 1;
 		}
 	}
-	
-	private class cart_xianjin_click implements OnClickListener{
+
+	private class cart_xianjin_click implements OnClickListener {
 		@Override
 		public void onClick(View v) {
-			setClick(cart_zhifubao);
+			cart_zhifubao.setBackgroundResource(R.drawable.recharge_unclick);
+			cart_yue.setBackgroundResource(R.drawable.recharge_unclick);
+			cart_zhifubao.setTextColor(getResources().getColor(
+					R.color.zaoke_orange));
+			cart_yue.setTextColor(getResources().getColor(R.color.zaoke_orange));
+			((TextView) v).setBackgroundResource(R.drawable.recharge_clicked);
+			((TextView) v).setTextColor(getResources().getColor(
+					R.color.izaoke_white));
 			paymode = 0;
 		}
 	}
-	
-	public void setClick(TextView tv) {
 
-		cart_zhifubao.setBackgroundResource(R.drawable.recharge_unclick);
-		cart_yue.setBackgroundResource(R.drawable.recharge_unclick);
-		cart_xianjin.setBackgroundResource(R.drawable.recharge_unclick);
-		cart_zhifubao.setTextColor(getResources().getColor(R.color.zaoke_orange));
-		cart_yue.setTextColor(getResources().getColor(R.color.zaoke_orange));
-		cart_xianjin.setTextColor(getResources().getColor(R.color.zaoke_orange));
-		paymode = -1;
-		if (tv != null) {
-			tv.setBackgroundResource(R.drawable.recharge_clicked);
-			tv.setTextColor(getResources().getColor(R.color.izaoke_white));
-		}
-	}
-
-	private class AlipayHandler extends Handler{
+	private Handler alipayHandler = new Handler() {
 		public void handleMessage(android.os.Message msg) {
 			Result.sResult = (String) msg.obj;
 
@@ -485,7 +566,7 @@ public class ShopingCartActivity extends AbstractActivity {
 		};
 	};
 
-	private class IsClickPayHandler extends Handler{
+	private class IsClickPayHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
 			dismissProgressDialog();
@@ -497,11 +578,14 @@ public class ShopingCartActivity extends AbstractActivity {
 					displayResponse("错误：" + folb.getMsg());
 					isPaySuccess(false);
 				} else {
-					if (folb.getOrders() == null || !folb.getOrders().containsKey(String.valueOf(order.getOrderId()))) {
+					if (folb.getOrders() == null
+							|| !folb.getOrders().containsKey(
+									String.valueOf(order.getOrderId()))) {
 						displayResponse("订单失败，请重新下单");
 						finish();
 					} else {
-						FinalOrderBase fob = folb.getOrders().get(order.getOrderId());
+						FinalOrderBase fob = folb.getOrders().get(
+								order.getOrderId());
 						isPaySuccess(fob.getStatus() == 1);
 					}
 				}
@@ -525,7 +609,8 @@ public class ShopingCartActivity extends AbstractActivity {
 		} else {
 			displayResponse("支付成功！");
 		}
-		Intent toOrderSuccessActivity = new Intent(ShopingCartActivity.this, OrderSuccessActivity.class);
+		Intent toOrderSuccessActivity = new Intent(ShopingCartActivity.this,
+				OrderSuccessActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putSerializable("order", order);
 		toOrderSuccessActivity.putExtras(bundle);
@@ -533,10 +618,10 @@ public class ShopingCartActivity extends AbstractActivity {
 		finish();
 	}
 
-	private class PayOrderHandler extends Handler{
+	private class PayOrderHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
-	
+
 			dismissProgressDialog();
 			super.handleMessage(msg);
 			switch (msg.what) {
@@ -550,15 +635,18 @@ public class ShopingCartActivity extends AbstractActivity {
 					order.setOrdertime(System.currentTimeMillis());
 					order.setBalance(pb.getBalance());
 					order.setQxImg(pb.getCode());
-//					if (paymode == 1) {
-//						dbaccount.setBalance(pb.getBalance() - order.getCombPrice());
-//					} else {
-//						dbaccount.setBalance(pb.getBalance());
-//					}
-//					dbaccount.setQxImg(pb.getCode());
-					//dbaccount.setStarttime(pb.get)
-//					as.saveOrUpdate(dbaccount);
-					Intent toOrderSuccessActivity = new Intent(ShopingCartActivity.this, OrderSuccessActivity.class);
+					// if (paymode == 1) {
+					// dbaccount.setBalance(pb.getBalance() -
+					// order.getCombPrice());
+					// } else {
+					// dbaccount.setBalance(pb.getBalance());
+					// }
+					// dbaccount.setQxImg(pb.getCode());
+					// dbaccount.setStarttime(pb.get)
+					// as.saveOrUpdate(dbaccount);
+					Intent toOrderSuccessActivity = new Intent(
+							ShopingCartActivity.this,
+							OrderSuccessActivity.class);
 					Bundle bundle = new Bundle();
 					bundle.putSerializable("order", order);
 					toOrderSuccessActivity.putExtras(bundle);
@@ -584,10 +672,9 @@ public class ShopingCartActivity extends AbstractActivity {
 						final String url = pb.getUrl();
 						new Thread() {
 							public void run() {
-								String result = new AliPay(ShopingCartActivity.this,new AlipayHandler()).pay(url);
-
+								String result = new AliPay(ShopingCartActivity.this, alipayHandler).pay(url);
 								Log.i("Alipay", "result = " + result);
-								new AlipayHandler().sendMessage(new AlipayHandler().obtainMessage(AppConstant.RQF_PAY, result));
+								alipayHandler.sendMessage(alipayHandler.obtainMessage(AppConstant.RQF_PAY,result));
 							}
 						}.start();
 						break;
@@ -619,12 +706,14 @@ public class ShopingCartActivity extends AbstractActivity {
 			if (resultCode != RESULT_OK)
 				return;
 			String code = data.getStringExtra("code");
-//			new Thread(new BindCardHttp(this, bindCardHandler, code, as.getAccount().getUserid(), as.getAccount().getTicket())).start();
+			 new Thread(new BindCardHttp(this, new BindCardHandler(), code,
+			 as.getAccount().getUserid(),
+			 as.getAccount().getTicket())).start();
 			showProgressDialog("正在绑定会员卡");
 		}
 	}
 
-	private class BindCardHandler extends Handler{
+	private class BindCardHandler extends Handler {
 
 		@Override
 		public void handleMessage(Message msg) {
