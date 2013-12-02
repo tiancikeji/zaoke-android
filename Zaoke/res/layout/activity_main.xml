@@ -43,7 +43,7 @@
         android:textColor="@drawable/main_text_font_selector"
         android:textSize="@dimen/main_text" />
 
-    <TextView
+<!--     <TextView
         android:id="@+id/main_iqx"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
         android:text="@string/main_iqx"
         android:textColor="@drawable/main_text_font_selector"
         android:textSize="@dimen/main_text" />
-
+ -->
     <ImageView
         android:id="@+id/imageView1"
         android:layout_width="wrap_content"

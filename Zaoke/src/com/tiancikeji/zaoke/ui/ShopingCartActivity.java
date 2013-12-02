@@ -46,7 +46,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class ShopingCartActivity extends AbstractActivity implements OnClickListener {
+public class ShopingCartActivity extends AbstractActivity {
 
 	private ImageView shoping_cart_back;
 	private TextView shoping_cart_submit;
@@ -97,7 +97,7 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 		}
 
 		if (isClickPay) {
-			new Thread(new FinalOrderListHttp(ShopingCartActivity.this, isClickPayHandler, dbaccount.getUserid(), dbaccount.getTicket())).start();
+			new Thread(new FinalOrderListHttp(ShopingCartActivity.this, new IsClickPayHandler(), dbaccount.getUserid(), dbaccount.getTicket())).start();
 		}
 	}
 
@@ -108,7 +108,8 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 		Bundle bundle = this.getIntent().getExtras();
 		orderBase = (OrderBase) bundle.getSerializable("orderBase");
 		init();
-
+//		String cart_place_name_string = bundle.getString("cart_place_name_string");
+//		cart_place_name.setText(cart_place_name_string);
 	}
 
 	public void init() {
@@ -140,8 +141,8 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 		as = new AccountService(this);
 		dbaccount = new Dbaccount();
 		
-//		SpannableString msp = new SpannableString("￥" + orderBase.getPrice());
-//		msp.setSpan(new StrikethroughSpan(), 0, String.valueOf(orderBase.getPrice()).length()+	1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+		SpannableString msp = new SpannableString("￥" + orderBase.getPrice());
+		msp.setSpan(new StrikethroughSpan(), 0, String.valueOf(orderBase.getPrice()).length()+	1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 		
 //		order_price_original.setText(msp);
 		order_combprice.setText("￥" + NumberFormateUtil.Formate(orderBase.getCombinePrice()));
@@ -149,7 +150,6 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 		dbaccount = as.getAccount();
 
 		if (orderBase.getShipin() != null && orderBase.getYinliao() != null) {
-
 			order.setShiwuId(orderBase.getShipin().getId());
 			order.setShiwuName(orderBase.getShipin().getName());
 			order.setShiwuPrice(orderBase.getShipin().getSale_price());
@@ -186,14 +186,14 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 			new Thread(new CheckOrderHttp(ShopingCartActivity.this, orderHandler, orderBase.getShipin().getId(), 0, name, dbaccount.getUserid(), dbaccount.getTicket())).start();
 		}
 
-		shoping_cart_submit.setOnClickListener(this);
-		shoping_cart_back.setOnClickListener(this);
-		shoping_cart_recharge.setOnClickListener(this);
-		shoping_cart_bindcart.setOnClickListener(this);
-		shoping_cart_changeplace.setOnClickListener(this);
-		cart_zhifubao.setOnClickListener(this);
-		cart_yue.setOnClickListener(this);
-		cart_xianjin.setOnClickListener(this);
+		shoping_cart_submit.setOnClickListener(new shoping_cart_submit_click());
+		shoping_cart_back.setOnClickListener(new shoping_cart_back_click());
+		shoping_cart_recharge.setOnClickListener(new shoping_cart_recharge_click());
+		shoping_cart_bindcart.setOnClickListener(new shoping_cart_bindcart_click());
+		shoping_cart_changeplace.setOnClickListener(new shoping_cart_changeplace_click());
+		cart_zhifubao.setOnClickListener(new cart_zhifubao_click());
+		cart_yue.setOnClickListener(new cart_yue_click());
+		cart_xianjin.setOnClickListener(new cart_xianjin_click());
 	}
 
 	private Handler orderHandler = new Handler() {
@@ -208,6 +208,7 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 				for (PaymodeBase pmb : checkOrderBase.getPaymode()) {
 					payMap.put(pmb.getMode(), pmb.getName());
 				}
+//				System.out.print("-----------"+checkOrderBase.getPick_loc_name()+"----------------");
 				if (!payMap.containsKey("0")) {
 					cart_xianjin.setVisibility(View.GONE);
 				}
@@ -223,6 +224,7 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 				if (checkOrderBase.getPick_loc_name() != null) {
 					shopping_cart_locmsg.setText(checkOrderBase.getPick_time());
 					cart_place_name.setText(checkOrderBase.getPick_loc_name());
+					System.out.print("-----------"+checkOrderBase.getPick_loc_name()+"----------------");
 					dbaccount.setLocal(checkOrderBase.getPick_loc_name());
 					dbaccount.setLocid(checkOrderBase.getPick_loc_id());
 					dbaccount.setStarttime(checkOrderBase.getPick_date());
@@ -264,86 +266,115 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 		});
 	}
 
-	@Override
-	public void onClick(View v) {
-		switch (v.getId()) {
-		case R.id.shoping_cart_submit:
-			if (order.isComplete()) {
-				if (TextUtils.isEmpty(cart_place_name.getText())) {
-					displayResponse("请选择取餐地点");
-				} else if (paymode == -1) {
-					displayResponse("请选择支付方式");
-				} else {
-					order.setPaymode(paymode);
-					order.setLocal(dbaccount.getLocal());
-					order.setLocId(dbaccount.getLocid());
-					order.setStarttime(dbaccount.getStarttime());
-					order.setEndtime(dbaccount.getEndtime());
-					order.setUserid(dbaccount.getUserid());
-					final String shiwuId = order.getShiwuId() == null ? "" : String.valueOf(order.getShiwuId());
-					final String yinliaoId = order.getYinliaoId() == null ? "" : String.valueOf(order.getYinliaoId());
+	private class shoping_cart_submit_click implements OnClickListener {
+		@Override
+		public void onClick(View v) {
+			
 
-					if (paymode == 2 || paymode == 3)// 支付宝支付
-					{
-						if (payMap.containsKey("2") && payMap.containsKey("3")) { // 选择
-
-							AlertDialog.Builder alertDialog = new AlertDialog.Builder(ShopingCartActivity.this);
-							alertDialog.setItems(new String[] { "支付宝网页支付", "支付宝快捷支付" }, new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									switch (which) {
-									case 0:
-										paymode = 2;
-										showProgressDialog("提交订单中...");
-										new Thread(new PayHttp(ShopingCartActivity.this, payOrderHandler, shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
-										break;
-									case 1:
-										paymode = 3;
-										order.setPaymode(paymode);
-										showProgressDialog("提交订单中...");
-										new Thread(new PayHttp(ShopingCartActivity.this, payOrderHandler, shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
-										break;
-									}
-								}
-							});
-							alertDialog.show();
-						} else if (payMap.containsKey("3")) { // 支付宝快捷
-							paymode = 3;
-							order.setPaymode(paymode);
-							showProgressDialog("提交订单中...");
-							new Thread(new PayHttp(ShopingCartActivity.this, payOrderHandler, shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
-						} else { // 支付宝网页
-							showProgressDialog("提交订单中...");
-							new Thread(new PayHttp(ShopingCartActivity.this, payOrderHandler, shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
-						}
-					} else if (paymode == 1) {
-						showProgressDialog("提交订单中...");
-						new Thread(new PayHttp(ShopingCartActivity.this, payOrderHandler, shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
-					} else {
-						showProgressDialog("提交订单中...");
-						new Thread(new PayHttp(ShopingCartActivity.this, payOrderHandler, shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
-					}
-				}
-			} else {
-				displayResponse("订单信息不完整，请您检查一下");
+			
+			if (TextUtils.isEmpty(cart_place_name.getText())) {
+				displayResponse("请选择取餐地点");
+				return;
+			} 
+			if (paymode == -1) {
+				displayResponse("请选择支付方式");
+				return;
+			} 
+			
+			if(null == dbaccount.getPhone()){
+				Intent toRegister1 = new Intent(ShopingCartActivity.this, Register1Activity.class);
+				startActivity(toRegister1);
+				return;
 			}
-			break;
-		case R.id.shoping_cart_back:
+		
+			if (!order.isComplete()) {
+				displayResponse("订单信息不完整，请您检查一下");
+			}else{
+				order.setPaymode(paymode);
+				order.setLocal(dbaccount.getLocal());
+				order.setLocId(dbaccount.getLocid());
+				order.setStarttime(dbaccount.getStarttime());
+				order.setEndtime(dbaccount.getEndtime());
+				order.setUserid(dbaccount.getUserid());
+				final String shiwuId = order.getShiwuId() == null ? "" : String.valueOf(order.getShiwuId());
+				final String yinliaoId = order.getYinliaoId() == null ? "" : String.valueOf(order.getYinliaoId());
+
+				if (paymode == 2 || paymode == 3)// 支付宝支付
+				{
+					if (payMap.containsKey("2") && payMap.containsKey("3")) { // 选择
+
+						AlertDialog.Builder alertDialog = new AlertDialog.Builder(ShopingCartActivity.this);
+						alertDialog.setItems(new String[] { "支付宝网页支付", "支付宝快捷支付" }, new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								switch (which) {
+								case 0:
+									paymode = 2;
+									showProgressDialog("提交订单中...");
+									new Thread(new PayHttp(ShopingCartActivity.this, new PayOrderHandler(), shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
+									break;
+								case 1:
+									paymode = 3;
+									order.setPaymode(paymode);
+									showProgressDialog("提交订单中...");
+									new Thread(new PayHttp(ShopingCartActivity.this, new PayOrderHandler(), shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
+									break;
+								}
+							}
+						});
+						alertDialog.show();
+					} else if (payMap.containsKey("3")) { // 支付宝快捷
+						paymode = 3;
+						order.setPaymode(paymode);
+						showProgressDialog("提交订单中...");
+						new Thread(new PayHttp(ShopingCartActivity.this, new PayOrderHandler(), shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
+					} else { // 支付宝网页
+						showProgressDialog("提交订单中...");
+						new Thread(new PayHttp(ShopingCartActivity.this, new PayOrderHandler(), shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
+					}
+				} else if (paymode == 1) {
+					showProgressDialog("提交订单中...");
+					new Thread(new PayHttp(ShopingCartActivity.this, new PayOrderHandler(), shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
+				} else {
+					showProgressDialog("提交订单中...");
+					new Thread(new PayHttp(ShopingCartActivity.this, new PayOrderHandler(), shiwuId, yinliaoId, order.getUserid(), dbaccount.getTicket(), paymode, order.getLocId())).start();
+				}
+			}
+		}
+
+		
+	}
+	
+	private class shoping_cart_back_click implements OnClickListener{
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
 			finish();
-			break;
-		case R.id.shoping_cart_changeplace:
+		}
+	}
+	
+	private class shoping_cart_changeplace_click implements OnClickListener{
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
 			Intent toChangelocal = new Intent(ShopingCartActivity.this, ChangeLocalActivity.class);
 			Bundle bundle = new Bundle();
 			bundle.putBoolean("isRoot", true);
+			bundle.putSerializable("orderBase", orderBase);
 			toChangelocal.putExtras(bundle);
 			startActivity(toChangelocal);
-			break;
-		case R.id.shoping_cart_bindcart:
-			if (as.getAccount().getPhone() != null) {
+		}
+	}
+	
+	
+	private class shoping_cart_bindcart_click implements OnClickListener{
+		@Override
+		public void onClick(View v) {
+				if (as.getAccount().getPhone() != null) {
 				AlertDialog.Builder alertDialog = new AlertDialog.Builder(ShopingCartActivity.this);
 				alertDialog.setItems(new String[] { "扫描条码", "手工输入" }, new DialogInterface.OnClickListener() {
-
+	
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						switch (which) {
@@ -360,56 +391,70 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 				});
 				alertDialog.show();
 			} else {
-				new ZaokeAlertDialog(this, "用户注册后才能绑定会员卡，是否前往", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Intent toRegister1 = new Intent(ShopingCartActivity.this, Register1Activity.class);
-						startActivity(toRegister1);
-					}
-				}, new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				}).creat();
+//				new ZaokeAlertDialog(this, "用户注册后才能绑定会员卡，是否前往", new DialogInterface.OnClickListener() {
+//					@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//						Intent toRegister1 = new Intent(ShopingCartActivity.this, Register1Activity.class);
+//						startActivity(toRegister1);
+//					}
+//				}, new DialogInterface.OnClickListener() {
+//	
+//					@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//						dialog.dismiss();
+//					}
+//				}).creat();
 			}
-			break;
-		case R.id.shoping_cart_recharge:
+		}
+	}
+
+	private class shoping_cart_recharge_click implements OnClickListener{
+		@Override
+		public void onClick(View v) {
 			if (as.getAccount().getPhone() == null) {
-				new ZaokeAlertDialog(this, "用户注册后才能充值，是否前往", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Intent toRegister1 = new Intent(ShopingCartActivity.this, Register1Activity.class);
-						startActivity(toRegister1);
-					}
-				}, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				}).creat();
+//				new ZaokeAlertDialog(this, "用户注册后才能充值，是否前往", new DialogInterface.OnClickListener() {
+//					@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//						Intent toRegister1 = new Intent(ShopingCartActivity.this, Register1Activity.class);
+//						startActivity(toRegister1);
+//					}
+//				}, new DialogInterface.OnClickListener() {
+//					@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//						dialog.dismiss();
+//					}
+//				}).creat();
 			} else {
 				Intent toRechargeActivity = new Intent(ShopingCartActivity.this, RechargeActivity.class);
 				startActivity(toRechargeActivity);
 			}
-			break;
-		case R.id.cart_zhifubao:
-			setClick(cart_zhifubao);
-			paymode = 2;
-			break;
-		case R.id.cart_yue:
-			setClick(cart_yue);
-			paymode = 1;
-			break;
-		case R.id.cart_xianjin:
-			setClick(cart_xianjin);
-			paymode = 0;
-			break;
-
 		}
 	}
-
+	
+	private class cart_zhifubao_click implements OnClickListener{
+		@Override
+		public void onClick(View v) {
+			setClick(cart_zhifubao);
+			paymode = 2;
+		}
+	}
+	
+	private class cart_yue_click implements OnClickListener{
+		@Override
+		public void onClick(View v) {
+			setClick(cart_zhifubao);
+			paymode = 1;
+		}
+	}
+	
+	private class cart_xianjin_click implements OnClickListener{
+		@Override
+		public void onClick(View v) {
+			setClick(cart_zhifubao);
+			paymode = 0;
+		}
+	}
+	
 	public void setClick(TextView tv) {
 
 		cart_zhifubao.setBackgroundResource(R.drawable.recharge_unclick);
@@ -425,7 +470,7 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 		}
 	}
 
-	private Handler alipayHandler = new Handler() {
+	private class AlipayHandler extends Handler{
 		public void handleMessage(android.os.Message msg) {
 			Result.sResult = (String) msg.obj;
 
@@ -440,7 +485,7 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 		};
 	};
 
-	private Handler isClickPayHandler = new Handler() {
+	private class IsClickPayHandler extends Handler{
 		@Override
 		public void handleMessage(Message msg) {
 			dismissProgressDialog();
@@ -477,24 +522,18 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 	public void isPaySuccess(boolean isSuccess) {
 		if (!isSuccess) {
 			displayResponse("支付失败，订单转为领取时支付");
-			Intent toOrderSuccessActivity = new Intent(ShopingCartActivity.this, OrderSuccessActivity.class);
-			Bundle bundle = new Bundle();
-			bundle.putSerializable("order", order);
-			toOrderSuccessActivity.putExtras(bundle);
-			startActivity(toOrderSuccessActivity);
-			finish();
 		} else {
 			displayResponse("支付成功！");
-			Intent toOrderSuccessActivity = new Intent(ShopingCartActivity.this, OrderSuccessActivity.class);
-			Bundle bundle = new Bundle();
-			bundle.putSerializable("order", order);
-			toOrderSuccessActivity.putExtras(bundle);
-			startActivity(toOrderSuccessActivity);
-			finish();
 		}
+		Intent toOrderSuccessActivity = new Intent(ShopingCartActivity.this, OrderSuccessActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("order", order);
+		toOrderSuccessActivity.putExtras(bundle);
+		startActivity(toOrderSuccessActivity);
+		finish();
 	}
 
-	private Handler payOrderHandler = new Handler() {
+	private class PayOrderHandler extends Handler{
 		@Override
 		public void handleMessage(Message msg) {
 	
@@ -511,14 +550,14 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 					order.setOrdertime(System.currentTimeMillis());
 					order.setBalance(pb.getBalance());
 					order.setQxImg(pb.getCode());
-					if (paymode == 1) {
-						dbaccount.setBalance(pb.getBalance() - order.getCombPrice());
-					} else {
-						dbaccount.setBalance(pb.getBalance());
-					}
-					dbaccount.setQxImg(pb.getCode());
+//					if (paymode == 1) {
+//						dbaccount.setBalance(pb.getBalance() - order.getCombPrice());
+//					} else {
+//						dbaccount.setBalance(pb.getBalance());
+//					}
+//					dbaccount.setQxImg(pb.getCode());
 					//dbaccount.setStarttime(pb.get)
-					as.saveOrUpdate(dbaccount);
+//					as.saveOrUpdate(dbaccount);
 					Intent toOrderSuccessActivity = new Intent(ShopingCartActivity.this, OrderSuccessActivity.class);
 					Bundle bundle = new Bundle();
 					bundle.putSerializable("order", order);
@@ -545,10 +584,10 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 						final String url = pb.getUrl();
 						new Thread() {
 							public void run() {
-								String result = new AliPay(ShopingCartActivity.this, alipayHandler).pay(url);
+								String result = new AliPay(ShopingCartActivity.this,new AlipayHandler()).pay(url);
 
 								Log.i("Alipay", "result = " + result);
-								alipayHandler.sendMessage(alipayHandler.obtainMessage(AppConstant.RQF_PAY, result));
+								new AlipayHandler().sendMessage(new AlipayHandler().obtainMessage(AppConstant.RQF_PAY, result));
 							}
 						}.start();
 						break;
@@ -580,12 +619,12 @@ public class ShopingCartActivity extends AbstractActivity implements OnClickList
 			if (resultCode != RESULT_OK)
 				return;
 			String code = data.getStringExtra("code");
-			new Thread(new BindCardHttp(this, bindCardHandler, code, as.getAccount().getUserid(), as.getAccount().getTicket())).start();
+//			new Thread(new BindCardHttp(this, bindCardHandler, code, as.getAccount().getUserid(), as.getAccount().getTicket())).start();
 			showProgressDialog("正在绑定会员卡");
 		}
 	}
 
-	private Handler bindCardHandler = new Handler() {
+	private class BindCardHandler extends Handler{
 
 		@Override
 		public void handleMessage(Message msg) {

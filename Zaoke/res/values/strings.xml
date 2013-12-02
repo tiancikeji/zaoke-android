@@ -76,5 +76,6 @@
     
     <string name="my_order_price_original">原价：</string>  
     <string name="my_order_price">价格:</string> 
+       <string name="hello_world">Hello world!</string>
     
 </resources>

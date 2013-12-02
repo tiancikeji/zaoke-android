@@ -49,7 +49,7 @@ import android.widget.Toast;
 public class MainActivity extends AbstractActivity {
 	private TextView main_start;
 	private TextView main_izaoke;
-	private TextView main_iqx;
+//	private TextView main_iqx;
 	private AccountService accountService;
 	private Dbaccount dbacout;
 	private AutoRegBase autoRegBase;
@@ -59,7 +59,7 @@ public class MainActivity extends AbstractActivity {
 	private Boolean isThreadComplete = true;
 	private ImageView logo;
 	private Animation translateAnimation = null;  
-	private Animation alphaAnimation1,alphaAnimation2,alphaAnimation3;
+	private Animation alphaAnimation1,alphaAnimation2;//,alphaAnimation3;
 /*	private int count = 0;
 	private Count counter;*/
 
@@ -73,7 +73,7 @@ public class MainActivity extends AbstractActivity {
 	public void init() {
 		main_start = (TextView) findViewById(R.id.main_start);
 		main_izaoke = (TextView) findViewById(R.id.main_izaoke);
-		main_iqx = (TextView) findViewById(R.id.main_iqx);
+//		main_iqx = (TextView) findViewById(R.id.main_iqx);
 		
 		logo = (ImageView)findViewById(R.id.main_logo);
 		
@@ -89,13 +89,13 @@ public class MainActivity extends AbstractActivity {
 		alphaAnimation2.setDuration(1400);
 		alphaAnimation2.setStartOffset(1000);
 		
-		alphaAnimation3 = new AlphaAnimation(0f, 1.0f);
-		alphaAnimation3.setDuration(1600);
-		alphaAnimation3.setStartOffset(1000);
+//		alphaAnimation3 = new AlphaAnimation(0f, 1.0f);
+//		alphaAnimation3.setDuration(1600);
+//		alphaAnimation3.setStartOffset(1000);
 		
 		main_start.startAnimation(alphaAnimation1);
 		main_izaoke.startAnimation(alphaAnimation2);
-		main_iqx.startAnimation(alphaAnimation3);
+//		main_iqx.startAnimation(alphaAnimation3);
 /*		counter = new Count();
 		handler.post(counter);*/
 
@@ -114,7 +114,7 @@ public class MainActivity extends AbstractActivity {
 		new Thread(new CheckVersionService(this, uhandler)).start();
 		main_start.setOnClickListener(new onclick());
 		main_izaoke.setOnClickListener(new onclick());
-		main_iqx.setOnClickListener(new onclick());
+//		main_iqx.setOnClickListener(new onclick());
 
 	}
 
@@ -172,6 +172,7 @@ public class MainActivity extends AbstractActivity {
 					}
 				})).creat();
 	}
+	
 	class onclick implements OnClickListener {
 
 		@Override
@@ -186,10 +187,10 @@ public class MainActivity extends AbstractActivity {
 					Intent toIZaokeActivity = new Intent(MainActivity.this, IZaokeActivity.class);
 					startActivity(toIZaokeActivity);
 					break;
-				case R.id.main_iqx:
-					Intent toQxActivity = new Intent(MainActivity.this, QxActivity.class);
-					startActivity(toQxActivity);
-					break;
+//				case R.id.main_iqx:
+//					Intent toQxActivity = new Intent(MainActivity.this, QxActivity.class);
+//					startActivity(toQxActivity);
+//					break;
 				}
 			}else if(isThreadComplete==true&&isReg==false){
 				new Thread(new AutoRegHttp(MainActivity.this, mHandler, name)).start();
